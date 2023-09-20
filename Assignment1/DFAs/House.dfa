@@ -1,0 +1,72 @@
+#! NX/KF 4.0
+DefClass: House (ug_base_part);
+(Point Parameter) HouseOrigin: point(0,0,0); #Origin of the house
+(Integer Parameter) NumStorey: 3; #Number of storeys
+(Number Parameter) HouseWidth: 7000; #Width of the house
+(Number Parameter) HouseLength: 6000; #Length of the house
+(Number parameter) RoofHeight: 2400; #Height of the roof
+(Integer Parameter) BaseColor: 190; #Color of the walls of the house
+(Integer Parameter) AccentColor: 210; #Color of the accent of the house
+(Boolean Parameter) Room1?: TRUE; # Wether to reate front room or not
+(Boolean Parameter) Room2?: TRUE; # Wether to reate back room or not
+(Number) NumStorey_min: 1; 
+(Number) NumStorey_max: 4;
+(Number) HouseWidth_max: 10000;
+(Number) HouseWidth_min: 4000;
+(Number) HouseLength_min: 4000;
+(Number) HouseLength_max: 10000;
+(Integer) BaseColor_min: 1;
+(Integer) BaseColor_max: 210;
+(Integer) AccentColor_max: 1;
+(Integer) AccentColor_min: 210;
+(Number) RoofHeight_max: HouseWidth:*0.7;
+(Number) RoofHeight_min: HouseWidth:*0.2;
+(Number) StoreyHeight: 2400;
+(Number) WallThickness: 250;
+(Number) InnerWallThickness: 100;
+
+
+#List of arranged storyes
+(list) list1: loop {
+	for $x from 1 to NumStorey:;
+	for $pt is (vector(0,
+					0,
+					StoreyHeight:*($x-1)+WallThickness:*($x-1) - 1) + HouseOrigin:
+				);
+	append{
+		ug_createInstance(
+			{
+			class, Storey;
+			StoreyNr; $x;
+			StoreyOrigin; $pt;
+			StoreyWidth; HouseWidth:;
+			StoreyLength; HouseLength:;
+			StoreyHeight; StoreyHeight:;
+			WallThickness; WallThickness:;
+			InnerWallThickness; InnerWallThickness:;
+			BaseColor; BaseColor:;
+			AccentColor; AccentColor:;
+			Room1?; if ($x == 1) then FALSE else Room1?:; 
+			Room2?; Room2?:;
+
+		})
+	};
+};
+
+(list uncached modifiable) DemandValue: {list1:};
+
+(Child) Roof: {
+  class; Roof;
+  RoofWidth; HouseWidth:;
+  RoofLength; HouseLength:;
+  RoofHeight; RoofHeight:;
+  RoofOrigin; HouseOrigin: + 
+    vector(
+        0,
+        0,
+		(StoreyHeight: + WallThickness:)*NumStorey:
+        ); 
+  WallThickness; WallThickness:;
+  BaseColor; BaseColor:;
+  AccentColor; AccentColor:;
+};

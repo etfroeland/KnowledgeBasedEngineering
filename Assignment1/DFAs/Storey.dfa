@@ -1,0 +1,139 @@
+#! NX/KF 4.0
+DefClass: Storey (%ug_create_instance ug_base_part);
+(Integer Parameter) StoreyNr: 1; #The ground floor is 1, the first floor is 2, etc.
+(Number Parameter) StoreyWidth: 7000; #The width of the storey
+(Number Parameter) StoreyLength: 6000; #The length of the storey
+(Number Parameter) StoreyHeight: 2400; #The height of the storey
+(Number Parameter) WallThickness: 250; #The thickness of the walls
+(Number Parameter) InnerWallThickness: 100; #The thickness of the inner walls
+(Point Parameter) StoreyOrigin: point(0,0,0); #The origin of the storey
+(Integer Parameter) BaseColor: 1; #Wallcolor in storey
+(Integer Parameter) AccentColor: None; #Accent color in storey
+(Boolean Parameter) Room1?: TRUE; #For selecting which rooms to show
+(Boolean Parameter) Room2?: TRUE; #For selecting which rooms to show
+
+
+(Child) rightwall: {
+  class; Wall;
+  WallWidth; StoreyWidth:;
+  WallThickness; WallThickness:;
+  WallOrigin; StoreyOrigin: +
+    vector(
+        StoreyLength:-WallThickness:,
+        0,
+        WallThickness:
+        );
+  AccentColor; AccentColor:;
+  Window1?; TRUE;
+  Window2?; TRUE;
+  ParentFloor, floor:;
+  Operation, Unite;
+	Target, {floor:};     
+  };
+
+(Child) leftwall: {
+  class; Wall;
+  WallWidth; StoreyWidth:;
+  WallThickness; WallThickness:;
+  referenceFrame; framexy(StoreyOrigin: +
+    vector(
+        WallThickness:,
+        StoreyWidth:,
+        WallThickness:
+        ),
+    vector(-1,0,0),
+    vector(0,-1,0));
+  AccentColor; AccentColor:;
+  Window1?; TRUE;
+  Window2?; TRUE;
+  ParentFloor, floor:;
+  Operation, Unite;
+	Target, {floor:};  
+};
+
+(Child) frontwall: {
+  class; Wall;
+  WallWidth; StoreyLength:;
+  WallThickness; WallThickness:;
+  referenceFrame;
+    framexy(StoreyOrigin: +
+    vector(0,
+      WallThickness:,
+      WallThickness:),
+    vector(0,-1,0),
+    vector(1,0,0));
+  AccentColor; AccentColor:;
+  ParentFloor, floor:;
+  Operation, Unite;
+	Target, {floor:};  
+
+  #Only the ground floor frontwall has a door
+  Door?; if (StoreyNr: == 1) then TRUE else FALSE;
+  Window1?; if (StoreyNr: == 1) then FALSE else TRUE;
+  };
+
+(Child) backwall: {
+  class; Wall;
+  WallWidth; StoreyLength:;
+  WallThickness; WallThickness:;
+  referenceFrame; framexy(StoreyOrigin: +
+    vector(
+        StoreyLength:,
+        StoreyWidth:-WallThickness:,
+        WallThickness:),
+      vector(0,1,0),
+    vector(-1,0,0)
+    );
+  AccentColor; AccentColor:;
+  Window1?; TRUE;
+  Window2?; TRUE;
+  ParentFloor, floor:;
+  Operation, Unite;
+	Target, {floor:};  
+  };
+
+(Child) floor: {
+  class; ug_block;
+  Length; StoreyLength:;
+  Width; StoreyWidth:;
+  Height; rightwall:WallThickness:;
+  Origin; StoreyOrigin:; 
+  };
+
+(Child) colorBody: { 
+  Class, ug_body; 
+  Feature, {floor:}; 
+  Layer, 2; 
+  color, BaseColor:; 
+};
+
+(child) Room1: {
+  class; if (Room1?: = TRUE) then Room else NullDesign;
+  RoomWidth; StoreyWidth:/2;
+  RoomLength; StoreyLength:/2;
+  StoreyHeight; StoreyHeight:;
+  WallThickness; WallThickness:;
+	InnerWallThickness; InnerWallThickness:;  
+  StoreyOrigin; StoreyOrigin:;
+  ParentFloor, Floor:;
+};
+
+(child) Room2: {
+  class; if (Room2?: = TRUE) then Room else NullDesign;
+  RoomWidth; StoreyWidth:/2;
+  RoomLength; StoreyLength:/2;
+  StoreyHeight; StoreyHeight:;
+  WallThickness; WallThickness:;
+	InnerWallThickness; InnerWallThickness:; 
+  Inverted?; TRUE; #Room 2 is made by turning Room class upside down, which changes the door frame
+  referenceFrame; framexy(
+                          StoreyOrigin: + vector(
+                                                0,
+                                                StoreyWidth:,
+                                                StoreyHeight: + 2*WallThickness:),
+  vector(1,0,0),
+  vector(0,-1,0)
+  );
+  ParentFloor, Floor:;
+};
+

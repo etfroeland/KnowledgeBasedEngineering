@@ -1,0 +1,182 @@
+#! NX/KF 4.0
+
+DefClass: Roof (%ug_create_instance ug_base_part);
+(Point Parameter) RoofOrigin: point(0,0,0); #House origin
+(Number parameter) RoofWidth: 7000; #Width of roof
+(Number parameter) RoofLength: 6000; #Length of roof
+(Number parameter) RoofHeight: 2400; #Height of roof
+(Number Parameter) WallThickness: 250; #Thickness of walls in the house
+(Integer Parameter) AccentColor: 1; #Accent color of the house, gives the roof its color
+(Integer Parameter) BaseColor: 210; #Base color of the house, gives the walls their color
+(Number) RoofAngle: arctan((RoofHeight: + WallThickness:)/(RoofWidth:/2.0));
+
+(Child) floor: {
+  class; ug_block;
+  Length; RoofLength:;
+  Width; RoofWidth:;
+  Height; WallThickness:;
+  Origin; RoofOrigin: + 
+    vector(
+        0,
+        0,
+        0
+        ); 
+};
+
+(Child) FrontWall: {
+  class; ug_block;
+  Width; RoofWidth:;
+  Length; WallThickness:;
+  Height; RoofHeight:;
+  Origin; RoofOrigin: +
+    vector(
+        0,
+        0,
+        WallThickness:
+        );
+  Operation, Unite;
+  Target, {floor:};     
+  };
+
+  (Child) BackWall: {
+  class; ug_block;
+  Width; RoofWidth:;
+  Length; WallThickness:;
+  Height; RoofHeight:;
+  Origin; RoofOrigin: +
+    vector(
+        RoofLength:-WallThickness:,
+        0,
+        WallThickness:
+        );
+  Operation, Unite;
+  Target, {floor:};     
+  };
+
+(Child) Cut1: {
+  class; ug_block;
+  Length; RoofLength:;
+  Width; RoofWidth:;
+  Height; RoofHeight:*2;
+  Origin; RoofOrigin: + 
+    vector(
+        0,
+        0,
+        0
+        );
+  referenceFrame; framexy(RoofOrigin:,
+    vector(1,0,0),
+    vector(0,cos(RoofAngle:),sin(RoofAngle:))
+    );
+  Operation, Subtract;
+  Target, {FrontWall:, BackWall:};
+};
+
+(Child) Cut2: {
+  class; ug_block;
+  Length; RoofLength:;
+  Width; RoofWidth:;
+  Height; RoofHeight:*2;
+  Origin; RoofOrigin: + 
+    vector(
+        RoofLength:,
+        RoofWidth:,
+        0
+        );
+  referenceFrame; framexy(RoofOrigin:,
+    vector(-1,0,0),
+    vector(0,-cos(RoofAngle:),sin(RoofAngle:))
+    );
+  Operation, Subtract;
+  Target, {BackWall:, FrontWall:};
+};
+
+(Child) RoofTopTriangle1: {
+  class; ug_block;
+  Length; RoofLength:*2;
+  Width; RoofWidth:;
+  Height; WallThickness:;
+  Origin; RoofOrigin: + 
+    vector(
+        RoofLength:,
+        RoofWidth:,
+        0
+        );
+  referenceFrame; framexy(RoofOrigin:,
+    vector(-1,0,0),
+    vector(0,-cos(RoofAngle:),sin(RoofAngle:))
+    );
+};
+
+(Child) RoofTopTriangle2: {
+  class; ug_block;
+  Length; RoofLength:*2;
+  Width; RoofWidth:;
+  Height; WallThickness:;
+  Origin; RoofOrigin: + 
+    vector(
+        0,
+        0,
+        0
+        );
+  referenceFrame; framexy(RoofOrigin:,
+    vector(1,0,0),
+    vector(0,cos(RoofAngle:),sin(RoofAngle:))
+    );
+  Operation, Intersect;
+  Target, {RoofTopTriangle1:};
+};
+
+(Child) RoofDecking1: {
+  class; ug_block;
+  Length; RoofLength:;
+  Width; (RoofHeight: + WallThickness:)/sin(RoofAngle:)+WallThickness:/2;
+  Height; WallThickness:;
+  Origin; RoofOrigin: + 
+    vector(
+        RoofLength:,
+        RoofWidth:,
+        0
+        );
+  referenceFrame; framexy(RoofOrigin:,
+    vector(-1,0,0),
+    vector(0,-cos(RoofAngle:),sin(RoofAngle:))
+    );
+  Operation, Unite;
+  Target, {RoofDecking2:};
+};
+
+
+(Child) RoofDecking2: {
+  class; ug_block;
+  Length; RoofLength:;
+  Width; (RoofHeight: + WallThickness:)/sin(RoofAngle:)+WallThickness:/2;
+  Height; WallThickness:;
+  Origin; RoofOrigin: + 
+    vector(
+        0,
+        0,
+        0
+        );
+  referenceFrame; framexy(RoofOrigin:,
+    vector(1,0,0),
+    vector(0,cos(RoofAngle:),sin(RoofAngle:))
+    );
+  Operation, Unite;
+  Target, {RoofTopTriangle2:};
+};
+
+
+(Child) colorBody: { 
+  Class, ug_body; 
+  Feature, {floor:}; 
+  Layer, 2; 
+  color, BaseColor:; 
+};
+
+(Child) colorRoof: { 
+  Class, ug_body; 
+  Feature, {RoofTopTriangle1:}; 
+  Layer, 2; 
+  color, AccentColor:; 
+};

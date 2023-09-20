@@ -1,0 +1,63 @@
+#! NX/KF 4.0
+DefClass: Room (%ug_create_instance ug_base_part);
+(Point Parameter) StoreyOrigin: point(0,0,0); # Origin of the storey coordinate system
+(Number Parameter) RoomLength: None; # Length of the room
+(Number Parameter) RoomWidth: None; # Width of the room
+(Number Parameter) RoomHeight: 2400; # Height of the room
+(Number Parameter) WallThickness: 250; # Thickness of the walls of the storey
+(Number Parameter) InnerWallThickness: 100; # Thickness of the inner walls of the room
+(Number) DoorWidth: 1000; # Width of the door
+(Boolean Parameter) Inverted?: FALSE; # Invert the door position
+(instance parameter) ParentFloor: None; # Parent floor of the room for uniting
+
+(child) RoomBlock: {
+  class; ug_block;
+  Length; RoomLength: - WallThickness: + InnerWallThickness:;
+  Width; RoomWidth: - WallThickness: + InnerWallThickness:;
+  Height; RoomHeight:;
+  Origin; StoreyOrigin: + vector(
+                                WallThickness:,
+                                WallThickness:,
+                                WallThickness:
+                                );
+  Operation, Unite;
+  Target, {ParentFloor:};
+};
+
+(child) RoomCut: {
+  class; ug_block;
+  Length; RoomLength:-WallThickness:;
+  Width; RoomWidth:-WallThickness:;
+  Height; RoomHeight:;
+  Origin;
+     StoreyOrigin: + vector(
+                            WallThickness:,
+                            WallThickness:,
+                            WallThickness:
+                            );
+  Operation, Subtract,
+  Target, {RoomBlock:};
+};
+
+(child) DoorCut: {
+  class; ug_block;
+  Length; InnerWallThickness:;
+  Width; DoorWidth:;
+  Height; RoomHeight:- RoomHeight:/6;
+  Origin; if (Inverted?: = FALSE)
+    then
+      StoreyOrigin:+vector(
+                          RoomLength:,
+                          RoomWidth:/2,
+                          WallThickness:
+                          )
+    else 
+      StoreyOrigin:+vector(
+                          RoomLength:,
+                          RoomWidth:/2,
+                          WallThickness: + RoomHeight:/6
+                          );
+  Operation, Subtract,
+  Target, {RoomBlock:};
+};
+

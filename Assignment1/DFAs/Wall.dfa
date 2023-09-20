@@ -1,0 +1,99 @@
+#! NX/KF 4.0
+
+DefClass: Wall (%ug_create_instance ug_base_part);
+
+(Number Parameter) WallHeight: 2400; #Height of wall
+(Number Parameter) WallWidth: 1000; #Width of wall
+(Number Parameter) WallThickness: 250; #Thickness of wall
+(Point Parameter) WallOrigin: point(0,0,0); #Origin of wall
+(Boolean Parameter) Door?: FALSE; #Door or not in wall
+(Boolean Parameter) Window1?: TRUE; #Window or not
+(Boolean Parameter) Window2?: TRUE; #Window or not
+(instance parameter) ParentFloor: None; #For uniting parent and child
+(Integer Parameter) AccentColor: None; #Color of window and door
+
+(Child) base: {
+    class; ug_block;
+    Length; WallThickness:;
+    Width; WallWidth:;
+    Height; WallHeight:;
+    Origin; WallOrigin:;
+    Operation, Unite;
+		Target, {ParentFloor:};
+};
+
+(Child) window1Opening: {
+  class; if (Window1?: = TRUE) then ug_block else NullDesign;
+  Height; Window1:WindowHeight: + 2.5;
+  Width; Window1:WindowWidth: + 2.5;
+  Length; WallThickness:;
+  Origin; WallOrigin: + vector(
+                              0,
+                              WallWidth:/4.0 - Window1:WindowWidth:/2.0 - 1.25,
+                              WallHeight:/3.0 - 1.25
+                              );
+  Operation; Subtract;
+  Target; {base:};
+  };
+
+(Child) Window1: {
+  class; if (Window1?: = TRUE) then Window else NullDesign;
+  WindowOrigin;WallOrigin: +
+    vector(
+        WallThickness: - Window1:WindowThickness:,
+        WallWidth:/4.0 - Window1:WindowWidth:/2.0,
+        WallHeight:/3.0
+        );
+  AccentColor; AccentColor:;  
+  };
+
+(Child) window2Opening: {
+  class; if (Window2?: = TRUE) then ug_block else NullDesign;
+  Height; Window2:WindowHeight: + 2.5;
+  Width; Window2:WindowWidth: + 2.5;
+  Length; WallThickness:;
+  Origin; WallOrigin: + vector(
+                              0,
+                              WallWidth:*3.0/4.0 - Window2:WindowWidth:/2.0 - 1.25,
+                              WallHeight:/3.0 - 1.25
+                              );
+  Operation; Subtract;
+  Target; {base:};
+  };
+
+(Child) Window2: {
+  class; if (Window2?: = TRUE) then Window else NullDesign;
+  WindowOrigin;WallOrigin: +
+    vector(
+        WallThickness:-Window2:WindowThickness:,
+        WallWidth:*3.0/4.0-Window2:WindowWidth:/2.0,
+        WallHeight:/3.0
+        );
+  AccentColor; AccentColor:;  
+  };
+
+(Child) DoorOpening: {
+  class; if (Door?: = TRUE) then ug_block else NullDesign;
+  Height; Door:DoorHeight: + 2.5;
+  Width; Door:DoorWidth: + 2.5;
+  Length; WallThickness:;
+  Origin; WallOrigin: + 
+    vector(
+        0,
+        WallWidth:/3.0 - Door:DoorWidth:/2.0 - 1.25,
+        - 1.25
+        );
+  Operation; Subtract;
+  Target; {base:};
+  };
+
+(Child) Door: {
+  class; if (Door?: = TRUE) then Door else NullDesign;
+  DoorOrigin;WallOrigin: +
+    vector(
+          WallThickness:-child:DoorThickness:,
+          WallWidth:/3.0-Door:DoorWidth:/2.0,
+          0
+        );
+  AccentColor; AccentColor:; 
+  };

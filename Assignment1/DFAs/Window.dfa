@@ -1,0 +1,82 @@
+#! NX/KF 4.0
+
+DefClass: Window (%ug_create_instance ug_base_part);
+(Number Parameter) WindowHeight: 1000; #Height of the window in the wall
+(Number Parameter) WindowWidth: WindowHeight:; #Width of the window in the wall
+(Number) WindowThickness: 30; # Thickness of the windowpane
+(Point Parameter) WindowOrigin: point(0,0,0); # Origin of the window in the wall
+(Integer Parameter) AccentColor: None; # Color of the window
+
+(Child) base: {
+  class; ug_block;
+  Length; WindowThickness:;
+  Width; WindowWidth:;
+  Height; WindowHeight:;
+  Origin; WindowOrigin:;
+ };
+
+(Child) cut1: {
+  class; ug_block;
+  Length; WindowThickness:;
+  Width; WindowWidth: / 3.0;
+  Height; WindowHeight: * 0.4;
+  Origin; WindowOrigin: +
+  vector(
+    0,
+    WindowWidth:/9.0,
+    WindowHeight:- child:height: - WindowHeight:*0.2/3.0);
+  Operation; Subtract;
+  Target; {base:};
+  };
+
+(Child) cut2: {
+  class; ug_block;
+  Length; WindowThickness:;
+  Width; WindowWidth: / 3.0;
+  Height; WindowHeight: * 0.4;
+  Origin; WindowOrigin: +
+  vector(
+        0,
+        5.0*WindowWidth:/9.0,
+        WindowHeight:- child:height: - WindowHeight:*0.2/3.0
+      );
+  Operation; Subtract;
+  Target; {base:};
+  };
+
+  (Child) cut3: {
+  class; ug_block;
+  Length; WindowThickness:;
+  Width; WindowWidth: / 3.0;
+  Height; WindowHeight: * 0.4;
+  Origin; WindowOrigin: +
+  vector(
+        0,
+        5.0*WindowWidth:/9.0,
+        WindowHeight: - 2.*child:height: - 2.0*WindowHeight:*0.2/3.0
+        );
+  Operation; Subtract;
+  Target; {base:};
+  };
+
+(Child) cut4: {
+  class; ug_block;
+  Length; WindowThickness:;
+  Width; WindowWidth: / 3.0;
+  Height; WindowHeight: * 0.4;
+  Origin; WindowOrigin: +
+  vector(
+        0,
+        WindowWidth:/9.0,
+        WindowHeight: - 2.0*child:height: - 2.0*WindowHeight:*0.2/3.0
+        );
+  Operation; Subtract;
+  Target; {base:};
+  };
+
+(Child) colorWindow: { 
+  Class, ug_body; 
+  Feature, {base:}; 
+  Layer, 2; 
+  color, AccentColor:; 
+};

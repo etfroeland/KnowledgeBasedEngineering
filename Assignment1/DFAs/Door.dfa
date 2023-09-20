@@ -1,0 +1,52 @@
+#! NX/KF 4.0
+
+DefClass: Door (%ug_create_instance ug_base_part);
+(Number Parameter) DoorHeight: 2100; #Height of door
+(Number Parameter) DoorWidth: 1000; #Width of door
+(Number Parameter) DoorThickness: 30; #Thickness of door
+(Point Parameter) DoorOrigin: point(0,0,0); #Origin of door
+(Integer Parameter) AccentColor: None; #Color of door
+
+(Child) base: {
+  class; ug_block;
+  Length; DoorThickness:;
+  Width; DoorWidth:;
+  Height; DoorHeight:;
+  Origin; DoorOrigin:;
+ };
+
+(Child) cut1: {
+  class; ug_block;
+  Length; DoorThickness:;
+  Width; DoorWidth: *0.8;
+  Height; DoorHeight: * 0.9;
+  Origin; DoorOrigin: +
+  vector(
+    0,
+    DoorWidth:*0.1,
+    DoorHeight:*0.05);
+  Operation; Subtract;
+  Target; {base:};
+  };
+
+(Child) knob: {
+  class; ug_block;
+  Length; 70;
+  Width; 200;
+  Height; 50;
+  Origin; DoorOrigin: +
+  vector(
+    0,
+    0,
+    DoorHeight:*0.5);
+  Operation; Unite;
+  Target; {base:};
+  };
+
+(Child) colorDoor: { 
+  Class, ug_body; 
+  Feature, {base:}; 
+  Layer, 2; 
+  color, AccentColor:; 
+};
+

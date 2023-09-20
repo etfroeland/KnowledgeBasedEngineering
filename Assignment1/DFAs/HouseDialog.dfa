@@ -1,0 +1,118 @@
+#! NX/KF 4.0
+
+DefClass: HouseDialog (%ui_comp);
+(list) DialogItems: {parametersGroup1:,parametersGroup2:,parametersGroup3:, parametersGroup4:};
+(string) Title: "Create House";
+
+
+(child) parametersGroup1: {
+	class, %ui_comp_group,
+	Title, "Size Parameters";
+	Members, {enterStoreys:, enterLength:, enterWidth:, enterRoofHeight:};
+	Group, true
+};
+
+(child) enterStoreys: {
+	class, %ui_comp_integer,
+	Title, "Number of Storeys (1-4)";
+	value, 2;
+};
+
+
+(child) enterLength: {
+	class, %ui_comp_expression,
+	Title, "House length (4-10)";
+	value, 6;
+    units, "m";
+};
+
+(child) enterWidth: {
+	class, %ui_comp_expression,
+	Title, "House width (4-10)";
+    value, 7;
+    units, "m";
+};
+
+(child) enterRoofHeight: {
+	class, %ui_comp_expression,
+	Title, "Roof height";
+    units, "m";
+	value, 2.4;
+};
+
+(child) parametersGroup2: {
+	class, %ui_comp_group,
+	Title, "Origin";
+	Members, {enterX:, enterY:, enterZ:};
+	Group, true
+};
+
+(child) enterX: {
+	class, %ui_comp_double,
+	Title, "x";
+	value, 0; 
+};
+
+(child) enterY: {
+	class, %ui_comp_double,
+	Title, "y";
+	value, 0; 
+};
+
+(child) enterZ: {
+	class, %ui_comp_double,
+	Title, "z";
+	value, 0; 
+};
+
+(child) parametersGroup3: {
+	class, %ui_comp_group,
+	Title, "Color Parameters";
+	Members, {enterBaseColor:, enterAccentColor:};
+	Group, true
+};
+
+(child) enterBaseColor: {
+	class, %ui_comp_integer,
+	Title, "Base Color (1 - 210)";
+	value, 190;
+};
+
+(child) enterAccentColor: {
+	class, %ui_comp_integer,
+	Title, "Accent Color (1 - 210)";
+value, 210; 
+};
+
+(child) parametersGroup4: {
+	class, %ui_comp_group,
+	Title, "Layout Parameters";
+	Members, {enterRoom1:, enterRoom2:};
+	Group, true
+};
+
+(child) enterRoom1: {
+	class, %ui_comp_toggle,
+	Title, "Room front";
+	value, False; 
+};
+
+(child) enterRoom2: {
+	class, %ui_comp_toggle,
+	Title, "Room Back";
+	value, False; 
+};
+
+(child) BuildHouse: {
+	class, House;
+	HouseWidth, enterWidth:value:;
+	HouseLength, enterLength:value:;
+	RoofHeight, enterRoofHeight:value:;
+	NumStorey, enterStoreys:value:;
+	HouseOrigin, point(enterX:value:, enterY:value:, enterZ:value:);
+	BaseColor, enterBaseColor:value:;
+	AccentColor, enterAccentColor:value:;
+	Room1?, enterRoom1:value:;
+	Room2?, enterRoom2:value:;
+};
+
