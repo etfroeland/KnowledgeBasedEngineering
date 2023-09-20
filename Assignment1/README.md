@@ -1,1 +1,1 @@
-# Knoledge Fusion in Siemens NX
+# Knowledge Fusion in Siemens NX
